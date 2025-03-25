@@ -106,7 +106,7 @@ while run:
     screen.blit(background,(0,0))
     mouse_position = pg.mouse.get_pos()
     mouse_x,mouse_y = pg.mouse.get_pos()
-    font = pg.font.Font("F:\Cloud\OneDrive\Desktop\Fruity\\assets\Fonts\\OJ.otf",50)
+    font = pg.font.Font("assets\Fonts\OJ.otf",50)
     # screen.blit(cursor,(mouse_x -cursor.get_width()//2,mouse_y-cursor.get_height()//2)) non original code
     for fruit in fruits[:]: #shallow copy of list
         if not fruit[6]:
