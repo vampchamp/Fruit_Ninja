@@ -20,23 +20,28 @@ frenzy_mode = False
 rush_mode = False
 game_start = pg.mixer.Sound("assets\sounds\start.mp3")
 spawn_fruit = pg.USEREVENT + 1
-if not frenzy_mode:
-    pg.time.set_timer(spawn_fruit,2000)
-else:
-    pg.time.set_timer(spawn_fruit,1000)
+pg.time.set_timer(spawn_fruit,2000)
 decrement_time = pg.USEREVENT +2
 pg.time.set_timer(decrement_time,1000)
 clock = pg.time.Clock()
 background = pg.image.load("assets\images\\background2.jpg").convert()
 background = pg.transform.scale(background,(Screen_width,Screen_length))
-timer  =  60
+timer  =  32
 high_score = 0
 game_over = False
-#adding background music
-pg.mixer.music.load("assets\sounds\\bgmusic.mp3")
-pg.mixer.music.set_volume(0.1)
-pg.mixer.music.play(-1)
+music = {
+    "normal": "assets\sounds\\bgmusic.mp3",
+    "rush_mode" : "assets\sounds\\rush_mode (2).wav",
+    "frenzy_mode": "assets\sounds\\frenzy_mode.wav"
+    }
 #Using functions as per the requirements
+def load_and_play(song):
+    pg.mixer.music.load(song)
+    pg.mixer.music.set_volume(0.1)
+    pg.mixer.music.play(-1)
+
+load_and_play(music["normal"])
+
 def scale_image(image, width,height):
     image = pg.transform.scale(image,(width,height))
     return image
@@ -77,7 +82,8 @@ def score_up(score):
     score+=10
     return score
 
-
+def center(txt, y):
+    return txt.get_rect(center = (Screen_width/2,y))
 
 class particle:
     def __init__(self,x,y):
@@ -99,8 +105,6 @@ def create_particles(fruitx,fruity):
     for i in range(20):
         x = particle(fruitx,fruity)
         particles.append(x)  
-
-
 while run:
     #screen.fill('black') unnecesary for now
     screen.blit(background,(0,0))
@@ -199,21 +203,29 @@ while run:
     if timer == 0:
         game_over = True
         fruits.clear()
-    if timer<=10 and not timer<=0 and not frenzy_mode:
-        frenzy_mode = True
-        pg.time.set_timer(spawn_fruit, 500)
     if timer<=30 and timer>10 and not rush_mode:
         rush_mode = True
         pg.time.set_timer(spawn_fruit,1000)
+        load_and_play(music["rush_mode"])
+    if timer<=10 and not timer<=0 and not frenzy_mode:
+        frenzy_mode = True
+        pg.time.set_timer(spawn_fruit, 500)
+        load_and_play(music["frenzy_mode"])
     if game_over:
+        load_and_play(music["normal"])
         screen.fill("black")
         game_over_txt = font.render("GAME OVER", True,"red")
+        game_over_txt_center = center(game_over_txt, 100)
         score_txt = font.render(f"SCORE: {score}", True, "blue")
+        score_txt_center = center(score_txt, 200)
         high_score_txt = font.render(f"HIGH SCORE: {high_score}",True,"green")
+        high_score_txt_center = center(high_score_txt,300)
         retry = font.render("Press SPACE to try again!", True, "white")
-        screen.blit(game_over_txt,(250,0))
-        screen.blit(score_txt,(300,200))
-        screen.blit(high_score_txt,(250,300))
-        screen.blit(retry,(50,400))
+        retry_center = center(retry,400)
+        screen.blit(game_over_txt,game_over_txt_center)
+        screen.blit(score_txt,score_txt_center)
+        screen.blit(high_score_txt,high_score_txt_center)
+        screen.blit(retry,retry_center)
     pg.display.flip()
     clock.tick(60)
+    
